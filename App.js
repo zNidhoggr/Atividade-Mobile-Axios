@@ -3,6 +3,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button, ScrollView, TextInput } from 'react-native-web';
 import axios from 'axios';
 
+import { MMKV } from 'react-native-mmkv'
+export const storage = new MMKV()
+
 axios.defaults.baseURL = 'http://10.0.84.192:1337/api';
 
 export default function App() {
@@ -20,12 +23,26 @@ export default function App() {
         onChangeText={setSenha}
         secureTextEntry={true}
       />
+
+      <Button title="Mostrar dados" onPress={()=>{
+
+          console.log(storage.getString('user.name'));
+          console.log(storage.getString('user.password'));
+        }
+      }
+      />
+
       <Button title="Login" onPress={async () => 
           {
               try {
                 const response = await axios.post('/auth/local',{identifier:usuario,password:senha});
                 //console.log(response.data.jwt);
                 setJwt(response.data.jwt);
+                storage.set('user.name',usuario);
+                storage.set('user.password',senha);
+
+                console.log("OK!");
+                
               }
               catch (error) {
                 console.log(error);
